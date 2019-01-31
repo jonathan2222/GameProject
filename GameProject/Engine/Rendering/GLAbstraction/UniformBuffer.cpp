@@ -1,6 +1,6 @@
 #include "UniformBuffer.h"
 
-#include "GL/glew.h"<
+#include "GL/glew.h"
 
 UniformBuffer::UniformBuffer(unsigned shaderID, const std::string & blockName, unsigned bindingPoint)
 {
