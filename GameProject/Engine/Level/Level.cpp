@@ -43,6 +43,7 @@ void Level::read(std::string file, EntityManager *entityManager)
 
 	//Get amount of arrays to know how many entities to be made
 	int size = jsonFile.size();
+	jsonFile["Target"].size();
 
 
 	for (int i = 0; i < size && !readError; i++) 

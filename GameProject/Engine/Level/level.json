@@ -1,126 +1,23 @@
-[ //Example jsonFile[index]["Boxes"][i]["Position"][0]
-  { //Index 0
-    "Boxes": [
-      { //i == 1
-        "Name": "Box1",
-        "Position": [ 1, 5, 1 ] // 0 == position.x
-      },
-      { //i == 2
-        "Name": "Box2",
-        "Position": [ 2, 5, 1 ] // 1 == position.y
-      },
-      { //i == 3
-        "Name": "Box3",
-        "Position": [ 3, 5, 1 ] // 2 == position.z
-      }
-    ]
-  },
-  //Example jsonFile[index]["Targets"][i]["Position"][0]
-  { //Index 1
-    "Targets": [
-      {
-        "Name": "Target1",
-        "Position": [ 0, 6, 1 ]
-      },
-      {
-        "Name": "Target2",
-        "Position": [ 0, 7, 1 ]
-      },
-      {
-        "Name": "Target3",
-        "Position": [ 0, 8, 1 ]
-      }
-    ]
-  },
-  { //Index 2
-    "Arrow": [
-      {
-        "Position": [ 0, 5, 1 ]
-      }
-    ]
-  }
-]
-
-[ //Example jsonFile[index]["Boxes"][i]["PositionX"]
-  { //Index 0
-    "Boxes": [
-      { //i == 1
-        "Name": "Box1",
-        "PositionX": 1,
-        "PositionY": 5,
-        "PositionZ": 1
-      },
-      { //i == 2
-        "Name": "Box2",
-        "PositionX": 2,
-        "PositionY": 5,
-        "PositionZ": 1
-      }
-    ]
-  },
-  //Example jsonFile[index]["Targets"][i]["PositionX"]
-  { //Index 1
-    "Targets": [
-      {
-        "Name": "Target1",
-        "PositionX": 0,
-        "PositionY": 6,
-        "PositionZ": 1
-      },
-      {
-        "Name": "Target2",
-        "PositionX": 0,
-        "PositionY": 7,
-        "PositionZ": 1
-      }
-    ]
-  },
-  { //Index 2
-    "Arrow": [
-      {
-        "PositionX": 0,
-        "PositionY": 5,
-        "PositionZ": 1
-      }
-    ]
-  }
-]
-
-[
-  { //Example if (jasonFile[index][Type] == "BOX") { Do stuff for box }
-    "Type": "BOX",
-    "Name": "Box1",
-    "X": 1.0,
-    "Y": 5.0,
-    "Z": 1.0
-  },
-  {
-    "Type": "BOX",
-    "Name": "Box2",
-    "X": 2.0,
-    "Y": 5.0,
-    "Z": 1.0
-  },
-  { //Example if (jasonFile[index][Type] == "TARGET") { Do stuff for target }
-    "Type": "TARGET",
-    "Name": "Target1",
-    "X": 0.0,
-    "Y": 6.0,
-    "Z": 1.0
-  },
-  {
-    "Type": "TARGET",
-    "Name": "Target2",
-    "X": 0.0,
-    "Y": 7.0,
-    "Z": 1.0
-  },
-  {
-    "Type": "PLAYER",
-    "X": 0.0,
-    "Y": 5.0,
-    "Z": 1.0
-  }
-]
-
-//Depending on structure
+{
+  //Example j["Target"][i]["Position"][0]
+  "Target": [
+    {
+      "Name": "Target1",
+      "Position": [ 1, 5, 1 ]
+    },
+    {
+      "Name": "Target2",
+      "Position": [ 2, 5, 1 ]
+    }
+  ],
+  "Boxes": [
+    {
+      "Name": "Box1",
+      "Position": [ 1, 5, 1 ]
+    },
+    {
+      "Name": "Box2",
+      "Position": [ 2, 5, 1 ]
+    }
+  ]
+}
