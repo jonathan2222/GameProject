@@ -9,7 +9,6 @@ TargetMovementComponent::~TargetMovementComponent()
 {
 }
 
-
 void TargetMovementComponent::update(const float & dt)
 {
 	//Interpolation updating
