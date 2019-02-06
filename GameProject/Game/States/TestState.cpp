@@ -34,6 +34,7 @@ void TestState::start()
 {
 }
 
+
 void TestState::end()
 {
 }
@@ -42,6 +43,7 @@ void TestState::update(const float dt)
 {
 	this->cameraEntity->update(dt);
 	this->entity->update(dt);
+	LOG_PRINT("%f, %f, %f", cameraEntity->getTransform()->getPosition().x, cameraEntity->getTransform()->getPosition().y, cameraEntity->getTransform()->getPosition().z);
 }
 
 void TestState::updateLogic()

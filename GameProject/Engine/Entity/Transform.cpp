@@ -35,7 +35,8 @@ Transform::Transform()
 glm::mat4 Transform::getMatrix() const
 {
 	glm::mat4 ret = glm::mat4(1);
-	ret = glm::rotate(ret, rotation.x + rotation.y + rotation.z, glm::normalize(rotation));
+	if(rotation != glm::vec3(0))
+		ret = glm::rotate(ret, rotation.x + rotation.y + rotation.z, glm::normalize(rotation));
 	ret = glm::scale(ret, scaleFactor);
 	ret[3][0] = position.x;
 	ret[3][1] = position.y;
