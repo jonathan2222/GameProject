@@ -90,21 +90,23 @@ void ModelLoader::processMaterial(aiMaterial* material, Model* model, aiTextureT
         // Convert aiTextureType to TextureType
         TextureType txType = convertTextureType(type);
 
-        Texture* texture = TextureManager::loadTexture(directory + convertedString, txType);
+        Texture* texture = TextureManager::loadTexture(convertedString[0] != 'C' ? directory + convertedString : convertedString, txType);
 
         newMaterial.textures.push_back(texture);
     }
 
     // Store material constants
-    aiColor3D ambient;
+    //aiColor3D ambient;
     aiColor3D diffuse;
 
-    material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+    //material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
     material->Get(AI_MATKEY_COLOR_SPECULAR, diffuse);
-
+	/*
     newMaterial.Ka.r = ambient.r;
     newMaterial.Ka.g = ambient.g;
     newMaterial.Ka.b = ambient.b;
+	*/
+	newMaterial.Ka = glm::vec3(0.2f);
 
     newMaterial.Ks.r = diffuse.r;
     newMaterial.Ks.g = diffuse.g;

@@ -3,6 +3,7 @@
 #include "Engine/AssetManagement/Mesh.h"
 #include "Engine/Entity/Entity.h"
 #include "Engine/Events/EventBus.h"
+#include "Utils/Utils.h"
 
 Pipeline::Pipeline()
 {
@@ -17,6 +18,7 @@ Pipeline::Pipeline()
 	this->quadShader = new Shader("./Engine/Rendering/Shaders/PostProcessVert.vert", "./Engine/Rendering/Shaders/PostProcessFrag.frag");
 	this->testShader = new Shader("./Engine/Rendering/Shaders/EntityShader.vert", "./Engine/Rendering/Shaders/EntityShader.frag");
 	this->ZprePassShader = new Shader("./Engine/Rendering/Shaders/ZPrepassVert.vert", "./Engine/Rendering/Shaders/ZPrepassFrag.frag");
+	this->aoShader = new Shader("./Engine/Rendering/Shaders/AOFactor.vert", "./Engine/Rendering/Shaders/AOFactor.frag");
 	Display& display = Display::get();
 	int width = display.getWidth();
 	int height = display.getHeight();
@@ -33,6 +35,30 @@ Pipeline::Pipeline()
 	emptyMaterial.Ks = glm::vec3(1.0f);
 	this->uniformBuffer->setData((void*)(&emptyMaterial), sizeof(emptyMaterial) - sizeof(emptyMaterial.textures));
 
+	// Setup the kernel with random directions from a hemisphere.
+	this->kernelSize = 64;
+	for (int i = 0; i < kernelSize; i++)
+	{
+		glm::vec3 randDir = Utils::uniformHemisphere();
+		float scale = ((float)(i*i)) / ((float)(kernelSize*kernelSize));
+		randDir *= glm::mix(0.1f, 1.0f, scale);
+		this->kernel.push_back(randDir.x);
+		this->kernel.push_back(randDir.y);
+		this->kernel.push_back(randDir.z);
+	}
+
+	// Setup the texture with random directions from a circle in the xy-plane.
+	const int size = 4;
+	std::vector<GLfloat> randDirections(3 * size * size);
+	for (int i = 0; i < size*size; i++)
+	{
+		glm::vec3 v = Utils::uniformCircle();
+		randDirections[i * 3 + 0] = v.x;
+		randDirections[i * 3 + 1] = v.y;
+		randDirections[i * 3 + 2] = v.z;
+	}
+	this->randTexture = new Texture(randDirections.data(), size, size, GL_RGB32F, GL_RGB32F, GL_FLOAT);
+	this->randTexture->unbind();
 }
 
 
@@ -41,12 +67,33 @@ Pipeline::~Pipeline()
 	delete this->quadShader;
 	delete this->ZprePassShader;
 	delete this->testShader;
+	delete this->aoShader;
 	delete this->uniformBuffer;
+	delete this->randTexture;
 }
 
-void Pipeline::prePassDepth(const std::vector<Entity*>& renderingList)
+void Pipeline::aoPass(const std::vector<Entity*>& renderingList, Texture* depth)
 {
-	this->fbo.bind();
+	glDisable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	this->aoShader->bind();
+
+	this->aoShader->setUniformMatrix4fv("vp", 1, false, &(this->camera->getVP()[0][0]));
+	this->aoShader->setUniformMatrix4fv("view", 1, false, &(this->camera->getView()[0][0]));
+	this->aoShader->setUniformMatrix4fv("proj", 1, false, &(this->camera->getProj()[0][0]));
+	this->aoShader->setTexture2D("depthTex", 0, *depth);
+	this->aoShader->setTexture2D("randTex", 1, *this->randTexture);
+	this->aoShader->setUniform3fv("sampleKernel", this->kernelSize, this->kernel.data());
+	draw(renderingList, this->aoShader, false);
+
+	this->aoShader->unbind();
+}
+
+void Pipeline::prePassDepth(const std::vector<Entity*>& renderingList, bool toScreen)
+{
+	if(!toScreen)
+		this->fbo.bind();
 	this->prePassDepthOn();
 	this->ZprePassShader->bind();
 
@@ -56,7 +103,8 @@ void Pipeline::prePassDepth(const std::vector<Entity*>& renderingList)
 	
 	this->ZprePassShader->unbind();
 	this->prePassDepthOff();
-	this->fbo.unbind();
+	if (!toScreen)
+		this->fbo.unbind();
 }
 
 void Pipeline::prePassDepthOn()
@@ -100,7 +148,7 @@ Texture * Pipeline::drawToTexture(const std::vector<Entity*>& renderingList)
 	glEnable(GL_DEPTH_TEST);
 
 	this->fbo.bind();
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	this->testShader->bind();
 
 	this->testShader->setUniformMatrix4fv("vp", 1, false, &(this->camera->getVP()[0][0]));
@@ -150,12 +198,12 @@ void Pipeline::draw(const std::vector<Entity*>& renderingList)
 		if (model != nullptr)
 		{
 			this->ZprePassShader->setUniformMatrix4fv("transform", 1, false, &(transform->getMatrix()[0][0]));
-			this->drawModelPrePass(model);
+			this->drawModelWithoutMaterial(model);
 		}
 	}
 }
 
-void Pipeline::draw(const std::vector<Entity*>& renderingList, Shader* shader)
+void Pipeline::draw(const std::vector<Entity*>& renderingList, Shader* shader, bool useMaterial)
 {
 	for (Entity* entity : renderingList)
 	{
@@ -165,12 +213,15 @@ void Pipeline::draw(const std::vector<Entity*>& renderingList, Shader* shader)
 		if (model != nullptr)
 		{
 			shader->setUniformMatrix4fv("transform", 1, false, &(transform->getMatrix()[0][0]));
-			drawModel(model, shader);
+			if (useMaterial)
+				drawModel(model, shader);
+			else
+				drawModelWithoutMaterial(model);
 		}
 	}
 }
 
-void Pipeline::drawModelPrePass(Model * model)
+void Pipeline::drawModelWithoutMaterial(Model * model)
 {
 	for (size_t i = 0; i < model->meshCount(); i++)
 	{

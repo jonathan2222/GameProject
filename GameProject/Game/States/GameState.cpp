@@ -12,7 +12,16 @@
 GameState::GameState()
 {
 	EntityManager& entityManager = this->getEntityManager();
-	levelParser.readEntites("./Engine/Level/level.json", &entityManager);
+
+	Entity* roomEntity = entityManager.addEntity();
+	roomEntity->setModel(ModelLoader::loadModel("./Game/assets/Room/Room.fbx"));
+
+	Entity* cameraEntity = entityManager.addTracedEntity("Camera");
+	cameraEntity->getTransform()->setPosition({0.0, 0.0, 4.0});
+	new FreeMove(cameraEntity);
+	Camera* camera = new Camera(cameraEntity, "Camera", { 0.0f, 0.0f, 0.0f });
+	camera->init();
+	Display::get().getRenderer().setActiveCamera(camera);
 
 	InputHandler ih(Display::get().getWindowPtr());
 }

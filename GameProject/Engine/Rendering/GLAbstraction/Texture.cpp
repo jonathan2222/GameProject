@@ -12,9 +12,9 @@ Texture::Texture(const std::string & fileName, TextureType texType, unsigned int
 	loadImage(fileName, texType, internalFormat);
 }
 
-Texture::Texture(unsigned char * data, unsigned int width, unsigned int height, unsigned internalFormat, unsigned format, TextureType texType) : id(0)
+Texture::Texture(void * data, unsigned int width, unsigned int height, unsigned internalFormat, unsigned format, unsigned dataType, TextureType texType) : id(0)
 {
-	init(data, width, height, internalFormat, format, texType);
+	init(data, width, height, internalFormat, format, dataType, texType);
 }
 
 Texture::~Texture()
@@ -30,11 +30,11 @@ void Texture::reload(const std::string & fileName, TextureType texType, unsigned
 	loadImage(fileName, texType, internalFormat);
 }
 
-void Texture::recreate(unsigned char * data, unsigned int width, unsigned int height, unsigned internalFormat, unsigned format, TextureType texType)
+void Texture::recreate(void * data, unsigned int width, unsigned int height, unsigned internalFormat, unsigned format, unsigned dataType, TextureType texType)
 {
 	if (this->id != 0)
 		glDeleteTextures(1, &this->id);
-	init(data, width, height, internalFormat, format, texType);
+	init(data, width, height, internalFormat, format, dataType, texType);
 }
 
 void Texture::resize(unsigned int width, unsigned int height, unsigned internalFormat, unsigned format)
@@ -93,19 +93,19 @@ void Texture::loadImage(const std::string & fileName, TextureType texType, unsig
 
 	this->width = width;
 	this->height = height;
-	init(data, width, height, internalFormat, GL_RGBA, texType);
+	init(data, width, height, internalFormat, GL_RGBA, GL_UNSIGNED_BYTE, texType);
 
 	// Free image data as OpenGL is storing a copy
 	stbi_image_free(data);
 }
 
-void Texture::init(unsigned char * data, unsigned int width, unsigned int height, unsigned internalFormat, unsigned format, TextureType texType)
+void Texture::init(void * data, unsigned int width, unsigned int height, unsigned internalFormat, unsigned format, unsigned dataType, TextureType texType)
 {
 	this->type = texType;
 	// Use image data to create an OpenGL texture
 	glGenTextures(1, &this->id);
 	bind();
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, dataType, data);
 	setParameters();
 }
 

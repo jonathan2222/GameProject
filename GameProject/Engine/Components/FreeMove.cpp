@@ -4,7 +4,7 @@
 #include "../Entity/Entity.h"
 #include "glm/gtx/rotate_vector.hpp"
 #include "../Events/EventBus.h"
-#include "Utils/Logger.h"
+#include "../../Utils/Logger.h"
 
 FreeMove::FreeMove(Entity * parentEntity, const std::string& tagName) : Component(parentEntity, tagName)
 {

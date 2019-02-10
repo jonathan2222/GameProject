@@ -3,8 +3,8 @@
 #include <Windows.h>
 #include "GL/glew.h"
 
-#include <Utils/Logger.h>
-#include <Utils/stb_image.h>
+#include "Utils/Logger.h"
+#include "Utils/stb_image.h"
 #include "../Rendering/GLAbstraction/RenderingResources.h"
 #include "../Rendering/GLAbstraction/Texture.h"
 #include <map>
