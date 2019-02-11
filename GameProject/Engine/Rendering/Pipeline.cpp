@@ -40,8 +40,8 @@ Pipeline::Pipeline()
 	for (int i = 0; i < kernelSize; i++)
 	{
 		glm::vec3 randDir = Utils::uniformHemisphere();
-		float scale = ((float)(i*i)) / ((float)(kernelSize*kernelSize));
-		randDir *= glm::mix(0.1f, 1.0f, scale);
+		//float scale = ((float)(i*i)) / ((float)(kernelSize*kernelSize));
+		//randDir *= glm::mix(0.1f, 1.0f, scale);
 		this->kernel.push_back(randDir.x);
 		this->kernel.push_back(randDir.y);
 		this->kernel.push_back(randDir.z);
@@ -57,7 +57,7 @@ Pipeline::Pipeline()
 		randDirections[i * 3 + 1] = v.y;
 		randDirections[i * 3 + 2] = v.z;
 	}
-	this->randTexture = new Texture(randDirections.data(), size, size, GL_RGB32F, GL_RGB32F, GL_FLOAT);
+	this->randTexture = new Texture(randDirections.data(), size, size, GL_RGB16F, GL_RGB, GL_FLOAT);
 	this->randTexture->unbind();
 }
 
